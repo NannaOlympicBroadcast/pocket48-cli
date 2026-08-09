@@ -1,7 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('electron');
 const wasmInit = require('../../../rust-wasm.js');
+
+// CLI 与无头脚本会直接 require 本模块，此时进程里没有 electron。
+function getElectronApp() {
+    try {
+        return require('electron').app || null;
+    } catch (error) {
+        return null;
+    }
+}
 
 const { __x6c2adf8__ } = wasmInit;
 
@@ -14,7 +22,8 @@ async function ensureWasmLoaded() {
 
     try {
         const wasmName = '2.wasm';
-        const wasmPath = app.isPackaged
+        const app = getElectronApp();
+        const wasmPath = app && app.isPackaged
             ? path.join(process.resourcesPath, wasmName)
             : path.join(__dirname, '../../../2.wasm');
 

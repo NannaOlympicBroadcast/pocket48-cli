@@ -47,6 +47,48 @@
 - 电台：官方电台资源（口袋源）。
 
 
+## 命令行工具 `snh48`
+
+桌面端的口袋 48 能力同时提供了一个命令行版本，方便脚本化调用与 AI agent 集成。
+
+```bash
+npm install
+node bin/snh48.js help          # 全部命令
+npm link && snh48 help          # 可选：装成全局命令
+```
+
+成员参数支持中文名、昵称、拼音、缩写或数字 ID，工具会查名册自动解析：
+
+```bash
+snh48 roster --team X                    # Team X 在籍成员
+snh48 member info 二水                   # 昵称也能查
+snh48 shows --group SNH48 --days 7       # 近期公演与票务（免登录）
+snh48 room messages 杨冰怡 --limit 30    # 抓房间消息（需登录）
+snh48 room search 杨冰怡 生日 --scan 800 # 房间历史消息检索
+snh48 live list                          # 谁在直播
+```
+
+登录后才能使用消息、直播、翻牌等功能，Token 与桌面端共用：
+
+```bash
+snh48 login sms  <手机号>
+snh48 login code <手机号> <验证码>
+snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
+```
+
+输出在终端里是表格，重定向到管道时自动切成 JSON（也可显式 `--json`）：
+
+```json
+{ "ok": true, "command": "member search", "data": { "…": "…" } }
+{ "ok": false, "command": "member info", "error": "…", "hint": "…" }
+```
+
+退出码：`0` 成功、`1` 命令出错、`127` 未知命令。名册缓存 24 小时，`--refresh` 强制刷新。
+
+仓库内的 `.claude/skills/snh48-cli/` 是配套的 agent skill，说明了命令表、JSON 契约、
+成员寻址规则与哪些命令属于需要用户确认的写操作。
+
+
 ## 说点别的
 为什么要叫牙牙消息呢？因为原本只是太无聊了想看看牙以前发了什么消息，奈何直接下载出来的html文件看的实在是不太方便，于是想着写一个能检索消息的工具，方便我查找牙在什么时候发了什么消息。之后为了方便在电脑上看直播，于是加入了直播和回放，然后功能就越做越多了。Anyway，感谢使用。
 

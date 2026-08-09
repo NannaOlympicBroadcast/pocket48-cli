@@ -4,7 +4,11 @@
   "description": "牙牙消息",
   "homepage": "https://github.com/yk1z/yaya_msg",
   "main": "main.js",
+  "bin": {
+    "snh48": "bin/snh48.js"
+  },
   "scripts": {
+    "cli": "node bin/snh48.js",
     "database:build": "node scripts/build-web.js --database-runtime-only",
     "start": "npm run database:build && electron .",
     "web:build": "npm run database:build && node scripts/build-web.js",
@@ -24,7 +28,7 @@
   },
   "license": "GPL-3.0-only",
   "dependencies": {
-    "axios": "^1.15.2",
+    "axios": "^1.16.1",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.3",
     "lamejs": "^1.2.1",
