@@ -7,6 +7,7 @@ const TYPE_LABELS = {
     VIDEO: '视频',
     AUDIO: '语音',
     EXPRESSIMAGE: '表情',
+    REPLY: '回复',
     FLIPCARD: '翻牌',
     FLIPCARD_AUDIO: '语音翻牌',
     FLIPCARD_VIDEO: '视频翻牌',
@@ -93,6 +94,17 @@ function normalizeMessage(raw = {}) {
             message.extra.duration = Number((body && body.duration) || ext.duration || 0) || 0;
             message.text = `[${message.typeLabel}]`;
             break;
+        case 'REPLY': {
+            // bodys.replyInfo = { replyName 被回复者, replyText 被回复内容, text 本条回复 }
+            const info = (body && body.replyInfo) || ext.replyInfo || {};
+            message.extra.replyTo = String(info.replyName || '');
+            message.extra.replyText = String(info.replyText || '');
+            const reply = String(info.text || '');
+            message.text = message.extra.replyTo
+                ? `回复 ${message.extra.replyTo}「${message.extra.replyText}」：${reply}`
+                : reply || `[${message.typeLabel}]`;
+            break;
+        }
         case 'FLIPCARD':
         case 'FLIPCARD_AUDIO':
         case 'FLIPCARD_VIDEO': {
