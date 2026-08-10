@@ -4,11 +4,14 @@ const { displayWidth } = require('./output');
 
 const HELP_TOPICS = {
     账号: [
-        ['login sms <手机号>', '发送登录验证码（--area 86 --answer <图形验证答案>）'],
+        ['login [手机号]', '交互式短信登录：问手机号 → 发码 → 输验证码 → 存 Token'],
+        ['login qr', '扫码登录 live.48.cn（公演直播源；不产生口袋 Token）'],
+        ['login sms <手机号>', '仅发送验证码（--area 86 --answer <图形验证答案>）'],
         ['login code <手机号> <验证码>', '用验证码登录并保存 Token'],
         ['login token <token>', '直接注入 Token 并校验'],
+        ['login status', '同时查看口袋 48 与 live.48.cn 的登录状态'],
         ['whoami', '查看当前登录账号'],
-        ['logout', '清除本地 Token'],
+        ['logout', '清除本地 Token（--all 一并清除 live.48.cn）'],
         ['checkin', '口袋签到'],
         ['checkin status', '查看今日签到状态'],
         ['account switch <用户ID>', '大小号切换'],

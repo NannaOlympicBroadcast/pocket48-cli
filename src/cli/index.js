@@ -39,11 +39,22 @@ async function run(argv) {
         const topic = positionals[0] === 'help' ? positionals.slice(1).join(' ') : positionals.join(' ');
 
         if (resolveFormat(flags) === 'json') {
-            const groups = Object.fromEntries(Object.entries(HELP_TOPICS).map(([group, entries]) => [
-                group,
-                entries.map(([usage, description]) => ({ usage, description }))
-            ]));
-            process.stdout.write(`${JSON.stringify({ ok: true, command: 'help', data: { version: VERSION, groups } }, null, 2)}\n`);
+            const entries = Object.entries(HELP_TOPICS)
+                // 带主题时按分组名或命令前缀过滤，与文本模式保持一致。
+                .filter(([group]) => !topic || group === topic)
+                .map(([group, commands]) => [group, commands
+                    .filter(([usage]) => !topic || group === topic || usage.startsWith(topic))
+                    .map(([usage, description]) => ({ usage, description }))])
+                .filter(([, commands]) => commands.length > 0);
+
+            const groups = Object.fromEntries(entries.length > 0
+                ? entries
+                : Object.entries(HELP_TOPICS).map(([group, commands]) => [group, commands
+                    .filter(([usage]) => usage.startsWith(topic))
+                    .map(([usage, description]) => ({ usage, description }))])
+                    .filter(([, commands]) => commands.length > 0));
+
+            process.stdout.write(`${JSON.stringify({ ok: true, command: 'help', data: { version: VERSION, topic: topic || null, groups } }, null, 2)}\n`);
             return 0;
         }
 

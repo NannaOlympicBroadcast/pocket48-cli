@@ -57,19 +57,53 @@ node bin/snh48.js member info 6744   --json   # 口袋 memberId
 
 `--group` 接受 `SNH48 / BEJ48 / GNZ48 / CKG48 / CGT48`，也接受数字 gid。
 
-## 需要登录的命令
+## 登录：两套互不相通的凭据
 
-先确认登录状态：`node bin/snh48.js whoami --json`。未登录会返回 `ok:false` 且 error 为「尚未登录，缺少口袋 48 Token」。
+| 凭据 | 怎么拿 | 管什么 |
+| --- | --- | --- |
+| **口袋 48 Token** | 短信登录 / 直接注入 | 房间消息、私信、直播、翻牌、鸡腿榜——**绝大多数命令** |
+| **live.48.cn Cookie** | 扫码登录 | 仅公演直播源 |
 
-**不要替用户走短信登录流程**（需要用户自己收验证码）。缺 Token 时应当把 hint 转述给用户，请其二选一：
+**扫码不会产生口袋 Token。** 用户扫完码后 `room messages` 依然会报未登录——这不是 bug，要跟用户解释清楚，让其再走一次短信登录。
+
+先查状态（一次看两套）：
 
 ```bash
-node bin/snh48.js login sms  <手机号>            # 用户自己发验证码
-node bin/snh48.js login code <手机号> <验证码>   # 登录并保存 Token
-node bin/snh48.js login token <token>            # 已有 Token 时直接注入
+node bin/snh48.js login status --json
 ```
 
-Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN` 临时注入。
+返回 `{ pocket: { loggedIn, nickname, error }, live48: { loggedIn, accountInfo } }`。
+
+### 你能直接跑的
+
+```bash
+node bin/snh48.js login token <token>   # 用户已有 Token 时注入，会先校验再落盘
+node bin/snh48.js login qr              # 扫码（非 TTY 下会把二维码存成 PNG 并回传路径）
+```
+
+`login qr` 在 TTY 里直接把二维码画在终端上；非 TTY（也就是你调用时）会保存 PNG 到缓存目录，
+提示语走 stderr，stdout 仍是 JSON。默认等 300 秒，`--timeout <秒>` 可调。
+超时返回 `ok:false / 扫码超时`。
+
+### 你不能替用户跑的
+
+**短信登录必须由用户自己完成**——验证码只发到他们手机上。缺 Token 时把下面的命令给用户，让他们自己在终端执行：
+
+```bash
+node bin/snh48.js login                 # 交互式：问手机号 → 发码 → 输验证码 → 存 Token
+node bin/snh48.js login 13800138000     # 同上，手机号先给好
+```
+
+`snh48 login` 是交互式的，**在非 TTY 下会直接报错**（`当前不是交互式终端`），所以你调用它没有意义。
+如果用户希望你分步驱动，可以用这两条脚本化命令，但验证码仍得用户口述给你：
+
+```bash
+node bin/snh48.js login sms  <手机号>            # 发码；遇图形验证会在 hint 里给出题目与候选，用 --answer 重试
+node bin/snh48.js login code <手机号> <验证码>   # 用验证码换 Token 并保存
+```
+
+Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN` 或 `--token` 临时注入。
+`logout` 清口袋 Token，`logout --all` 连 live.48.cn 一起清。
 
 登录后可用：
 
@@ -80,7 +114,7 @@ Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN`
 | 互动 | `dynamic <成员>`、`weibo <成员>`、`flip list`、`flip prices <成员>`、`member lives <成员>` |
 | 数据 | `rank week`、`rank list`、`rank year`、`rank member <成员>`、`albums`、`trip [成员]` |
 | 48区 | `area newest`、`area recommend`、`area post <postId>` |
-| 账号 | `whoami`、`checkin`、`account money`、`account unread`、`member following` |
+| 账号 | `whoami`、`login status`、`checkin`、`account money`、`account unread`、`member following` |
 | 私信 | `dm list`、`dm read <成员>` |
 
 完整清单：`node bin/snh48.js help --json` 或 `node bin/snh48.js help 消息`。
@@ -141,6 +175,9 @@ node bin/snh48.js api /user/api/v1/user/star/archives '{"memberId":6744}' --json
 
 - `尚未登录，缺少口袋 48 Token` → 让用户按上文登录，别自己硬试。
 - `token解密失败` / `status 401005` → Token 过期，请用户重新登录。
+- `当前不是交互式终端` → 你调了交互式的 `snh48 login`；改用 `login token` / `login qr`，或把 `login sms` + `login code` 交给用户。
+- 用户说「我扫码了但还是提示没登录」→ 扫码只给 live.48.cn，口袋功能仍需短信登录，见上文凭据表。
+- `需要先通过图形验证` → hint 里带了题目和候选，让用户选一个后用 `login sms <手机号> --answer <答案>` 重试。
 - `「X」匹配到多位成员` → 按 hint 里的候选改用全名或 ID。
 - `名册加载失败` → `data.gnz.hk` 或 `h5.48.cn` 不可达，检查网络；纯数字 ID 仍可直接用。
 - 需要看调试日志时加 `--verbose`（日志走 stderr，不会污染 stdout 的 JSON）。

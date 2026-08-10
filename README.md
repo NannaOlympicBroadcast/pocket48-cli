@@ -71,10 +71,16 @@ snh48 live list                          # 谁在直播
 登录后才能使用消息、直播、翻牌等功能，Token 与桌面端共用：
 
 ```bash
-snh48 login sms  <手机号>
-snh48 login code <手机号> <验证码>
+snh48 login                              # 交互式：问手机号 → 发码 → 输验证码 → 存 Token
+snh48 login qr                           # 扫码登录 live.48.cn，终端直接画出二维码
+snh48 login status                       # 同时查看两套凭据的状态
 snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 ```
+
+注意这是**两套互不相通的凭据**：短信登录拿到的口袋 Token 管房间消息、私信、直播、翻牌等绝大多数功能；
+扫码拿到的是 live.48.cn 的登录态，只用于公演直播源，**不能替代口袋 Token**。
+
+`snh48 login` 需要交互式终端；写脚本时用 `login sms` + `login code` 这对可分步调用的命令。
 
 输出在终端里是表格，重定向到管道时自动切成 JSON（也可显式 `--json`）：
 
