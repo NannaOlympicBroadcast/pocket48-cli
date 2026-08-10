@@ -627,10 +627,11 @@ async function loginSendSms({ mobile, area, answer }) {
             payload.answer = answer;
         }
 
+        // 必须带 pa 签名，否则服务端直接返回 403 HTML 页而不是 JSON。
         const response = await axios.post(
             'https://pocketapi.48.cn/user/api/v1/sms/send2',
             payload,
-            { headers: createHeaders() }
+            { headers: await createLoginHeaders() }
         );
 
         if (response.status === 200 && response.data.status === 200) {
