@@ -1480,13 +1480,14 @@ function getLoginRequestPa(pa) {
     return '';
 }
 
-async function loginSendSms({ mobile, area, answer }) {
+async function loginSendSms({ mobile, area, answer, pa }) {
     const payload = { mobile, area: area || '86' };
     if (answer) payload.answer = answer;
+    // 必须带 pa 签名，否则服务端直接返回 403 HTML 页而不是 JSON。
     const response = await postJson(
         'https://pocketapi.48.cn/user/api/v1/sms/send2',
         payload,
-        createHeaders()
+        createHeaders(null, getLoginRequestPa(pa))
     );
     if (response.status === 200 && response.data?.status === 200) return { success: true };
     if (response.data?.status === 2001) {
