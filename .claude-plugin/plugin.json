@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "pocket48-cli",
+  "displayName": "口袋 48 / SNH48 GROUP",
+  "version": "2.9.0",
+  "description": "查询 SNH48 GROUP（SNH48/BEJ48/GNZ48/CKG48/CGT48）与口袋 48 的数据：成员名册与档案、房间消息抓取与检索、直播与回放、公演场次与票务、翻牌、鸡腿榜、48 区与私信。",
+  "author": {
+    "name": "yk1z",
+    "email": "yk1z@users.noreply.github.com",
+    "url": "https://github.com/NannaOlympicBroadcast"
+  },
+  "homepage": "https://github.com/NannaOlympicBroadcast/pocket48-cli#readme",
+  "repository": "https://github.com/NannaOlympicBroadcast/pocket48-cli",
+  "license": "GPL-3.0-only",
+  "keywords": [
+    "snh48",
+    "pocket48",
+    "bej48",
+    "gnz48",
+    "ckg48",
+    "idol",
+    "cli",
+    "dsh-plugin"
+  ]
+}

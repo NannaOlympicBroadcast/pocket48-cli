@@ -91,8 +91,42 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 退出码：`0` 成功、`1` 命令出错、`127` 未知命令。名册缓存 24 小时，`--refresh` 强制刷新。
 
-仓库内的 `.claude/skills/snh48-cli/` 是配套的 agent skill，说明了命令表、JSON 契约、
-成员寻址规则与哪些命令属于需要用户确认的写操作。
+## 插件
+
+同一套 CLI 能力对外有两个插件形态，共用 `src/cli/` 这一份实现，没有第二套逻辑。
+
+### Claude Code 插件
+
+```
+/plugin marketplace add NannaOlympicBroadcast/pocket48-cli
+/plugin install pocket48-cli@pocket48
+```
+
+装完 `bin/` 会进 PATH，直接 `snh48 <命令>` 即可。带来：
+
+- **skill** `snh48-cli` — 命令表、JSON 契约、成员寻址规则、写操作的确认流程与排错手册。
+  问到 48 系的人和事时会自动触发，不必点名。
+- **斜杠命令** — `/live` 谁在直播、`/shows` 公演与余票、`/room` 房间消息、`/member` 成员档案、
+  `/login` 登录与凭据、`/dm` 发私信、`/flip` 翻牌提问。
+- **subagent** `pocket48-researcher` — 需要串联名册、消息、直播、行程、榜单的多步调查交给它。
+
+写操作（私信、翻牌、送礼、关注、签到）是支持的，但 skill 与命令都要求**先复述、等确认、再执行**。
+
+### DeepSeek Harness 插件
+
+仓库整体就是一个 DSH bundle（根 `package.json` 的 `dsh.bundle` → `cordis.patch.yml`）：
+
+```sh
+dsh plugin --profile <名字> add github:NannaOlympicBroadcast/pocket48-cli
+dsh --profile <名字>
+```
+
+注册九个模型可调用的工具：`snh48_roster`、`snh48_member`、`snh48_room`、`snh48_live`、
+`snh48_shows`、`snh48_rank`、`snh48_feed`、`snh48_login`，以及受限的逃生舱 `snh48_run`。
+纯 ESM、无构建步骤，从 git 直接装不需要 pnpm 的 `allowBuilds` 授权。
+
+默认只读——送礼、发私信、翻牌这些要在 profile 里显式配 `allowWrites: true` 才放行。
+细节见 [`dsh/README.md`](dsh/README.md)。
 
 
 ## 说点别的

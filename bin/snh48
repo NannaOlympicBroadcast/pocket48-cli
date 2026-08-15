@@ -1,0 +1,18 @@
+#!/bin/sh
+# `snh48` 包装脚本。插件安装后 bin/ 会被加进 Bash 工具的 PATH，
+# 于是 skill 里可以直接写 `snh48 ...`，不必关心插件被装到了哪个目录。
+
+set -e
+
+# 解析出脚本自身所在目录（不依赖 GNU readlink -f，macOS 上也能跑）。
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+ROOT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+
+# CLI 依赖 axios / qrcode 等运行时包，缺了就给一句能照做的提示，
+# 而不是抛一个 MODULE_NOT_FOUND 让调用方去猜。
+if [ ! -d "$ROOT_DIR/node_modules/axios" ]; then
+    echo "snh48：缺少运行时依赖，请先在 $ROOT_DIR 执行 \`npm install --omit=dev\`" >&2
+    exit 1
+fi
+
+exec node "$ROOT_DIR/bin/snh48.js" "$@"

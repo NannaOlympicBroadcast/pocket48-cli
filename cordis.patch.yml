@@ -1,0 +1,17 @@
+# DeepSeek Harness 配置层。
+#
+# package.json 的 dsh.bundle 指向本文件；`dsh plugin --profile <name> add github:NannaOlympicBroadcast/pocket48-cli`
+# 把包装进 profile 后，这一层会按 profile 的 bundles 顺序叠加上去。
+#
+# 行里的 name 用的是包名子路径（不是相对源码路径），这样 Node 解析走的是安装后的位置。
+# 包名是 yaya_msg（桌面端「牙牙消息」的既有身份），与仓库名 pocket48-cli 不同，这是有意保留的。
+- insert:
+    - id: snh48-pocket48
+      name: yaya_msg/dsh
+      config:
+        # 留空则沿用 CLI 自己的解析顺序：SNH48_TOKEN 环境变量 → 与桌面端共用的本地设置。
+        token: ''
+        # 单条命令的超时（毫秒）。room search --scan 调大时相应放宽。
+        timeoutMs: 120000
+        # 默认只读。打开后 snh48_run 才允许送礼、发私信、翻牌、关注、签到与直连 api。
+        allowWrites: false

@@ -1,12 +1,13 @@
 ---
 name: snh48-cli
-description: 驱动本仓库的 `snh48` 命令行工具，查询 SNH48 GROUP（SNH48/BEJ48/GNZ48/CKG48/CGT48）与口袋 48 的数据——成员名册与档案、房间消息抓取与检索、直播与回放地址、公演场次与票务、翻牌、鸡腿榜、48 区、私信。当用户问到 48 系成员资料/生日/队伍/期数、某成员在口袋房间说了什么、谁在直播、这周有什么公演、票还有没有、翻牌记录、鸡腿榜排名，或直接提到 snh48 / 口袋48 / pocket48 / 星梦剧院 / 牙牙消息 时使用本 skill；即使用户没点名工具也应主动使用。
+description: 驱动 `snh48` 命令行工具，读写 SNH48 GROUP（SNH48/BEJ48/GNZ48/CKG48/CGT48）与口袋 48 的数据——成员名册与档案、房间消息抓取与检索、直播与回放地址、公演场次与票务、翻牌、鸡腿榜、48 区、私信。当用户问到 48 系成员资料/生日/队伍/期数、某成员在口袋房间说了什么、谁在直播、这周有什么公演、票还有没有、翻牌记录、鸡腿榜排名，或要求给成员发私信、翻牌提问、送礼、关注、签到，或直接提到 snh48 / 口袋48 / pocket48 / 星梦剧院 / 牙牙消息 时使用本 skill；即使用户没点名工具也应主动使用。
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   tags:
     - snh48
     - pocket48
     - cli
+    - dsh-plugin
 ---
 
 # snh48 CLI
@@ -15,7 +16,9 @@ metadata:
 
 ## 调用约定
 
-- 在仓库根目录执行：`node bin/snh48.js <命令>`（已 `npm link` 时可直接 `snh48 <命令>`）。
+- 直接跑 `snh48 <命令>`。本 skill 随插件分发，插件的 `bin/` 会被加进 PATH，不必关心装在哪。
+  没进 PATH 时退回 `"${CLAUDE_PLUGIN_ROOT}"/bin/snh48 <命令>`；在仓库里开发则是 `node bin/snh48.js <命令>`。
+- 报 `缺少运行时依赖` 时，在插件目录执行一次 `npm install --omit=dev` 即可。
 - **始终加 `--json`**。非 TTY 下虽然默认就是 JSON，但显式传更稳妥，输出格式也才有保证。
 - 输出恒为一个信封，先看 `ok` 再取 `data`：
 
@@ -32,9 +35,9 @@ metadata:
 几乎所有涉及成员的命令都接受**中文名、昵称、拼音、缩写或数字 ID**，CLI 会查名册自动解析：
 
 ```bash
-node bin/snh48.js member info 杨冰怡 --json
-node bin/snh48.js member info 二水   --json   # 昵称
-node bin/snh48.js member info 6744   --json   # 口袋 memberId
+snh48 member info 杨冰怡 --json
+snh48 member info 二水   --json   # 昵称
+snh48 member info 6744   --json   # 口袋 memberId
 ```
 
 - 名册里**存在重名**（例如分属 SNH48 与 GNZ48 的两位「李沁洁」）。全名精确命中多条时：只有一位在籍就取在籍那位，否则**报错并在 hint 里列出候选**，不会静默选错人。模糊匹配同分时同样报错。遇到这种错误就改用 `memberId` 重试。
@@ -69,7 +72,7 @@ node bin/snh48.js member info 6744   --json   # 口袋 memberId
 先查状态（一次看两套）：
 
 ```bash
-node bin/snh48.js login status --json
+snh48 login status --json
 ```
 
 返回 `{ pocket: { loggedIn, nickname, error }, live48: { loggedIn, accountInfo } }`。
@@ -77,8 +80,8 @@ node bin/snh48.js login status --json
 ### 你能直接跑的
 
 ```bash
-node bin/snh48.js login token <token>   # 用户已有 Token 时注入，会先校验再落盘
-node bin/snh48.js login qr              # 扫码（非 TTY 下会把二维码存成 PNG 并回传路径）
+snh48 login token <token>   # 用户已有 Token 时注入，会先校验再落盘
+snh48 login qr              # 扫码（非 TTY 下会把二维码存成 PNG 并回传路径）
 ```
 
 `login qr` 在 TTY 里直接把二维码画在终端上；非 TTY（也就是你调用时）会保存 PNG 到缓存目录，
@@ -90,16 +93,16 @@ node bin/snh48.js login qr              # 扫码（非 TTY 下会把二维码存
 **短信登录必须由用户自己完成**——验证码只发到他们手机上。缺 Token 时把下面的命令给用户，让他们自己在终端执行：
 
 ```bash
-node bin/snh48.js login                 # 交互式：问手机号 → 发码 → 输验证码 → 存 Token
-node bin/snh48.js login 13800138000     # 同上，手机号先给好
+snh48 login                 # 交互式：问手机号 → 发码 → 输验证码 → 存 Token
+snh48 login 13800138000     # 同上，手机号先给好
 ```
 
 `snh48 login` 是交互式的，**在非 TTY 下会直接报错**（`当前不是交互式终端`），所以你调用它没有意义。
 如果用户希望你分步驱动，可以用这两条脚本化命令，但验证码仍得用户口述给你：
 
 ```bash
-node bin/snh48.js login sms  <手机号>            # 发码；遇图形验证会在 hint 里给出题目与候选，用 --answer 重试
-node bin/snh48.js login code <手机号> <验证码>   # 用验证码换 Token 并保存
+snh48 login sms  <手机号>            # 发码；遇图形验证会在 hint 里给出题目与候选，用 --answer 重试
+snh48 login code <手机号> <验证码>   # 用验证码换 Token 并保存
 ```
 
 Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN` 或 `--token` 临时注入。
@@ -117,15 +120,36 @@ Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN`
 | 账号 | `whoami`、`login status`、`checkin`、`account money`、`account unread`、`member following` |
 | 私信 | `dm list`、`dm read <成员>` |
 
-完整清单：`node bin/snh48.js help --json` 或 `node bin/snh48.js help 消息`。
+完整清单：`snh48 help --json` 或 `snh48 help 消息`。
 
-## 写操作需要用户确认
+## 写操作
 
-以下命令会**对外产生真实动作或消耗用户的鸡腿/星币**，除非用户在本轮明确要求，否则不要执行；执行前复述清楚要做什么：
+写操作是支持的，但它们会**对外产生真实动作或消耗用户的鸡腿/星币**，且基本撤不回来。
+规矩只有一条：**先复述，等用户确认，再执行**。
 
-`flip ask`（付费提问）、`flip delete`、`dm send`（发私信）、`live send-gift`（送礼，花钱）、`member follow` / `member unfollow`、`checkin`、`account switch`、`area` 的发帖与评论。
+| 命令 | 用法 | 代价 |
+| --- | --- | --- |
+| `dm send <成员> <内容>` | 发私信，成员之后的所有词拼成正文 | 免费，但对方收得到 |
+| `flip ask <成员> <问题>` | 翻牌提问，`--price <价格ID>` 选价位、`--type` 选类型 | **花鸡腿/星币** |
+| `flip delete <questionId>` | 撤回提问，`--type` 同上 | 免费 |
+| `live send-gift <liveId> <giftId> [数量]` | 直播送礼，必须带 `--accept <成员用户ID>` | **花钱** |
+| `member follow <成员>` / `member unfollow <成员>` | 关注 / 取关 | 免费 |
+| `checkin` | 口袋签到 | 免费 |
+| `account switch <用户ID>` | 大小号切换 | 改变后续所有命令的身份 |
 
-只读查询无需确认。
+执行前的固定动作：
+
+1. **先解析成员**：`member info <成员> --json` 确认是要操作的那个人。报「匹配到多位成员」
+   就把候选列给用户，**绝不**自己挑一个。
+2. **翻牌先查价**：`flip prices <成员> --json`，把价位念给用户，不要替他们挑贵的。
+3. **复述**：把「对谁、做什么、花多少」原样念一遍，问「确认吗？」。用户明确同意才继续。
+   即便用户在同一轮里已经说清楚了，仍要复述一次再发。
+4. 执行后把 `data.sent` 与失败时的 `error` / `hint` 如实转述。
+
+口袋 48 **没有**「往成员房间发消息」这条路——`room *` 全是只读的。
+想对成员说话只有两条路：`dm send`（私信）和 `flip ask`（翻牌）。
+
+只读查询无需确认，正常跑就行。
 
 ## 消息数据的形状
 
@@ -153,22 +177,22 @@ Token 与桌面端共用一份本地设置；也可用环境变量 `SNH48_TOKEN`
 
 ```bash
 # 「杨冰怡最近说了什么」
-node bin/snh48.js room messages 杨冰怡 --limit 30 --json
+snh48 room messages 杨冰怡 --limit 30 --json
 
 # 「她提过毕业吗」
-node bin/snh48.js room search 杨冰怡 毕业 --scan 800 --json
+snh48 room search 杨冰怡 毕业 --scan 800 --json
 
 # 「这周 SNH48 有什么公演，票还有吗」
-node bin/snh48.js shows --group SNH48 --days 7 --json
+snh48 shows --group SNH48 --days 7 --json
 
 # 「现在谁在直播」
-node bin/snh48.js live list --json
+snh48 live list --json
 
 # 「找出 Team X 的在籍成员」
-node bin/snh48.js roster --team X --json
+snh48 roster --team X --json
 
 # 直连任意口袋接口（前面都不满足时的逃生舱）
-node bin/snh48.js api /user/api/v1/user/star/archives '{"memberId":6744}' --json
+snh48 api /user/api/v1/user/star/archives '{"memberId":6744}' --json
 ```
 
 ## 排错
