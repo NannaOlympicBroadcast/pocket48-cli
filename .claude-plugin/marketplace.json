@@ -1,0 +1,18 @@
+{
+  "name": "pocket48",
+  "owner": {
+    "name": "yk1z",
+    "url": "https://github.com/NannaOlympicBroadcast"
+  },
+  "plugins": [
+    {
+      "name": "pocket48-cli",
+      "source": "./",
+      "description": "口袋 48 / SNH48 GROUP 数据查询：名册、房间消息、直播回放、公演票务、翻牌与鸡腿榜。",
+      "version": "2.9.0",
+      "author": {
+        "name": "yk1z"
+      }
+    }
+  ]
+}
