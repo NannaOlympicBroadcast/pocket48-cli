@@ -1,11 +1,11 @@
 {
-  "name": "yaya-msg",
+  "name": "snh48-cli
   "owner": {
-    "name": "yk1z",
-    "url": "https://github.com/yk1z/yaya_msg"
+    "name": "yanyan",
+    "url": "https://github.com/NannaOlympicBroadcast/pocket48-cli"
   },
   "metadata": {
-    "description": "牙牙消息 —— 口袋 48 工具集",
+    "description": "口袋48技能",
     "version": "1.0.0"
   },
   "plugins": [
