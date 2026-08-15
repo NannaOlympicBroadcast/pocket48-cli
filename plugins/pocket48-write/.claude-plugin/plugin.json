@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "pocket48-write",
   "displayName": "口袋 48 · 写操作",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "给 pocket48-cli 补上写操作：发私信、翻牌提问与撤回。会真实送达对方并消耗鸡腿/星币，因此单独成包，安装后默认不启用。",
   "author": {
     "name": "yanyan",
