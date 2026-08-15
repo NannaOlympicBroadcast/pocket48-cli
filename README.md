@@ -95,22 +95,42 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 同一套 CLI 能力对外有两个插件形态，共用 `src/cli/` 这一份实现，没有第二套逻辑。
 
-### Claude Code 插件
+### Claude Code 插件市场
+
+本仓库同时是一个 **Claude Code plugin marketplace**（`pocket48`），里面有两个插件：
 
 ```
 /plugin marketplace add NannaOlympicBroadcast/pocket48-cli
 /plugin install pocket48-cli@pocket48
 ```
 
-装完 `bin/` 会进 PATH，直接 `snh48 <命令>` 即可。带来：
+装完 `bin/` 会进 PATH，直接 `snh48 <命令>` 即可。
 
-- **skill** `snh48-cli` — 命令表、JSON 契约、成员寻址规则、写操作的确认流程与排错手册。
-  问到 48 系的人和事时会自动触发，不必点名。
-- **斜杠命令** — `/live` 谁在直播、`/shows` 公演与余票、`/room` 房间消息、`/member` 成员档案、
-  `/login` 登录与凭据、`/dm` 发私信、`/flip` 翻牌提问。
-- **subagent** `pocket48-researcher` — 需要串联名册、消息、直播、行程、榜单的多步调查交给它。
+#### `pocket48-cli` — 只读查询
 
-写操作（私信、翻牌、送礼、关注、签到）是支持的，但 skill 与命令都要求**先复述、等确认、再执行**。
+| 组件 | 内容 |
+| --- | --- |
+| skill | `snh48-cli`：命令表、JSON 契约、成员寻址规则、登录流程与排错手册。问到 48 系的人和事时自动触发，不必点名 |
+| 斜杠命令 | `/live` 谁在直播、`/shows` 公演与余票、`/room` 房间消息、`/member` 成员档案、`/login` 登录与凭据 |
+| subagent | `pocket48-researcher`：需要串联名册、消息、直播、行程、榜单的多步调查交给它 |
+
+#### `pocket48-write` — 写操作（可选，默认停用）
+
+```
+/plugin install pocket48-write@pocket48
+/plugin enable  pocket48-write@pocket48
+```
+
+| 组件 | 内容 |
+| --- | --- |
+| skill | `snh48-write`：写操作的命令表与「先复述、等用户确认、再执行」四步流程 |
+| 斜杠命令 | `/dm` 发私信、`/flip` 翻牌提问与撤回 |
+
+单独成包是因为这些命令会**真实送达对方或消耗鸡腿/星币**：不想让 Claude 碰这些的人
+只装 `pocket48-cli` 就行。它声明了对 `pocket48-cli` 的依赖，装它会把只读那包一并带上；
+安装后默认停用，得显式 `enable` 才生效。
+
+这跟 DSH 那边 `allowWrites` 默认关闭是同一个取舍，只是换了一种表达方式。
 
 ### DeepSeek Harness 插件
 
