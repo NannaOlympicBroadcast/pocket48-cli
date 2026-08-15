@@ -1,36 +1,23 @@
 {
-  "name": "pocket48",
-  "description": "SNH48 GROUP 与口袋 48 的数据工具箱：成员名册与档案、房间消息、直播与回放、公演票务、鸡腿榜，以及可选的私信与翻牌写操作。底层是本仓库的 snh48 命令行工具。",
+  "name": "snh48-cli
   "owner": {
     "name": "yanyan",
-    "email": "2769221745@qq.com",
-    "url": "https://github.com/NannaOlympicBroadcast"
+    "url": "https://github.com/NannaOlympicBroadcast/pocket48-cli"
+  },
+  "metadata": {
+    "description": "口袋48技能",
+    "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "pocket48-cli",
-      "source": "./plugins/pocket48-cli",
-      "description": "查询 SNH48 GROUP（SNH48/BEJ48/GNZ48/CKG48/CGT48）与口袋 48：成员名册与档案、房间消息抓取与检索、直播与回放、公演场次与票务、鸡腿榜、48 区。只读。",
-      "version": "2.9.2",
-      "category": "data",
-      "tags": [
+      "name": "snh48-cli",
+      "source": "./",
+      "description": "SNH48 GROUP 与口袋 48 的只读查询工具：成员名册与档案、房间消息抓取与检索、直播与回放地址、公演场次与票务、翻牌、鸡腿榜、48 区。",
+      "category": "productivity",
+      "keywords": [
         "snh48",
         "pocket48",
-        "idol",
-        "cli",
-        "read-only"
-      ]
-    },
-    {
-      "name": "pocket48-write",
-      "source": "./plugins/pocket48-write",
-      "description": "给 pocket48-cli 补上写操作：发私信、翻牌提问与撤回。会真实送达对方并消耗鸡腿/星币，安装后默认不启用。",
-      "version": "2.9.2",
-      "category": "data",
-      "tags": [
-        "snh48",
-        "pocket48",
-        "write"
+        "口袋48"
       ]
     }
   ]

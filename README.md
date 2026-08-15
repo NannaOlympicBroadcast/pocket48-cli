@@ -91,85 +91,24 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 退出码：`0` 成功、`1` 命令出错、`127` 未知命令。名册缓存 24 小时，`--refresh` 强制刷新。
 
-## 插件
+配套的 agent skill 在 `skills/snh48-cli/`，说明了命令表、JSON 契约、成员寻址规则、
+分页语义与只读限制（`.claude/skills/snh48-cli` 是指向它的符号链接，便于在仓库内开发时被直接识别）。
 
-同一套 CLI 能力对外有两个插件形态，共用 `src/cli/` 这一份实现，没有第二套逻辑。
+### 作为 Claude 插件安装
 
-### Claude Code 插件市场
-
-本仓库同时是一个 **Claude Code plugin marketplace**（`pocket48`），里面有两个插件：
-
-```
-/plugin marketplace add NannaOlympicBroadcast/pocket48-cli
-/plugin install pocket48-cli@pocket48
-```
-
-装完 `bin/` 会进 PATH，直接 `snh48 <命令>` 即可。
-
-#### `pocket48-cli` — 只读查询
-
-| 组件 | 内容 |
-| --- | --- |
-| skill | `snh48-cli`：命令表、JSON 契约、成员寻址规则、登录流程与排错手册。问到 48 系的人和事时自动触发，不必点名 |
-| 斜杠命令 | `/live` 谁在直播、`/shows` 公演与余票、`/room` 房间消息、`/member` 成员档案、`/login` 登录与凭据 |
-| subagent | `pocket48-researcher`：需要串联名册、消息、直播、行程、榜单的多步调查交给它 |
-
-#### `pocket48-write` — 写操作（可选，默认停用）
+本仓库同时是一个插件 marketplace，可直接在 Claude Code / Claude Desktop 里安装：
 
 ```
-/plugin install pocket48-write@pocket48
-/plugin enable  pocket48-write@pocket48
+/plugin marketplace add NannaOlympicBroadcast/yaya_msg
+/plugin install snh48-cli@yaya-msg
 ```
 
-| 组件 | 内容 |
-| --- | --- |
-| skill | `snh48-write`：写操作的命令表与「先复述、等用户确认、再执行」四步流程 |
-| 斜杠命令 | `/dm` 发私信、`/flip` 翻牌提问与撤回 |
+装完在插件目录里跑一次 `npm install --omit=dev` 装依赖（插件是克隆下来的，不带 `node_modules`；
+缺依赖时命令会直接提示该跑什么）。
 
-单独成包是因为这些命令会**真实送达对方或消耗鸡腿/星币**：不想让 Claude 碰这些的人
-只装 `pocket48-cli` 就行。它声明了对 `pocket48-cli` 的依赖，装它会把只读那包一并带上；
-安装后默认停用，得显式 `enable` 才生效。
-
-这跟 DSH 那边 `allowWrites` 默认关闭是同一个取舍，只是换了一种表达方式。
-
-#### 仓库布局
-
-```
-.claude-plugin/marketplace.json     市场清单（仓库根只是市场，不再是插件）
-plugins/pocket48-cli/               只读插件
-  ├─ skills/ commands/ agents/      真实文件
-  ├─ bin src/cli src/common …       → 指向仓库根的符号链接
-  └─ package.json + package-lock.json
-plugins/pocket48-write/             写插件（纯提示词，靠 PATH 上的 snh48 干活）
-```
-
-两个插件都放在 `plugins/` 下，而不是让只读那个用 `source: "./"` 占着仓库根——
-根目录当插件时，Claude Directory 里只会显示子目录里的那个，只读插件不出现。
-
-`bin`、`src/cli`、`src/common`、`src/main/services`、`2.wasm`、`rust-wasm.js`
-是符号链接，安装时会被解引用成真实文件，所以插件是自包含的，不依赖用户手里有没有这份仓库。
-配套的 `package-lock.json` 会让 Claude Code 在拷贝后自动 `npm ci --ignore-scripts`
-把 axios/qrcode/pngjs 装进去——**没有 lockfile 就不会装**，插件会因为缺依赖跑不起来。
-
-> **Windows 注意**：git 在 Windows 上默认不创建符号链接（`core.symlinks=false`），
-> 此时这些链接会被检出成内容为路径字符串的普通文件，只读插件将无法运行。
-> 需要在 Windows 上用的话，开启开发者模式或 `git config --global core.symlinks true` 后重新克隆。
-
-### DeepSeek Harness 插件
-
-仓库整体就是一个 DSH bundle（根 `package.json` 的 `dsh.bundle` → `cordis.patch.yml`）：
-
-```sh
-dsh plugin --profile <名字> add github:NannaOlympicBroadcast/pocket48-cli
-dsh --profile <名字>
-```
-
-注册九个模型可调用的工具：`snh48_roster`、`snh48_member`、`snh48_room`、`snh48_live`、
-`snh48_shows`、`snh48_rank`、`snh48_feed`、`snh48_login`，以及受限的逃生舱 `snh48_run`。
-纯 ESM、无构建步骤，从 git 直接装不需要 pnpm 的 `allowBuilds` 授权。
-
-默认只读——送礼、发私信、翻牌这些要在 profile 里显式配 `allowWrites: true` 才放行。
-细节见 [`dsh/README.md`](dsh/README.md)。
+**插件默认只读**：`checkin`、`member follow/unfollow`、`dm send`、`flip ask/delete`、
+`live send-gift`、`account switch` 这些会改动账号或花钱的命令会被拒绝，需要显式加
+`--allow-write` 或设 `SNH48_ALLOW_WRITE=1` 才放行。在仓库里直接开发时不受此限制。
 
 
 ## 说点别的
@@ -190,6 +129,3 @@ Gemini ChatGPT [48tools](https://github.com/duan602728596/48tools) [msg48](https
 
 ## 特别感谢
 泊然 · 恩帅没有心 · linlin · Thri_Twee · 西伯利亚土拨鼠 · 仙欲喵 · 小可w · 小日月 · 小吸吸 · yimo
-
-
-
