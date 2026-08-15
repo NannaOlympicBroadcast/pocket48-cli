@@ -91,8 +91,24 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 退出码：`0` 成功、`1` 命令出错、`127` 未知命令。名册缓存 24 小时，`--refresh` 强制刷新。
 
-仓库内的 `.claude/skills/snh48-cli/` 是配套的 agent skill，说明了命令表、JSON 契约、
-成员寻址规则与哪些命令属于需要用户确认的写操作。
+配套的 agent skill 在 `skills/snh48-cli/`，说明了命令表、JSON 契约、成员寻址规则、
+分页语义与只读限制（`.claude/skills/snh48-cli` 是指向它的符号链接，便于在仓库内开发时被直接识别）。
+
+### 作为 Claude 插件安装
+
+本仓库同时是一个插件 marketplace，可直接在 Claude Code / Claude Desktop 里安装：
+
+```
+/plugin marketplace add NannaOlympicBroadcast/yaya_msg
+/plugin install snh48-cli@yaya-msg
+```
+
+装完在插件目录里跑一次 `npm install --omit=dev` 装依赖（插件是克隆下来的，不带 `node_modules`；
+缺依赖时命令会直接提示该跑什么）。
+
+**插件默认只读**：`checkin`、`member follow/unfollow`、`dm send`、`flip ask/delete`、
+`live send-gift`、`account switch` 这些会改动账号或花钱的命令会被拒绝，需要显式加
+`--allow-write` 或设 `SNH48_ALLOW_WRITE=1` 才放行。在仓库里直接开发时不受此限制。
 
 
 ## 说点别的
@@ -113,6 +129,3 @@ Gemini ChatGPT [48tools](https://github.com/duan602728596/48tools) [msg48](https
 
 ## 特别感谢
 泊然 · 恩帅没有心 · linlin · Thri_Twee · 西伯利亚土拨鼠 · 仙欲喵 · 小可w · 小日月 · 小吸吸 · yimo
-
-
-

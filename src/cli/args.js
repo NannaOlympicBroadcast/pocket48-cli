@@ -12,7 +12,8 @@ const BOOLEAN_FLAGS = new Set([
     'verbose',
     'help',
     'version',
-    'no-color'
+    'no-color',
+    'allow-write'
 ]);
 
 function parseArgs(argv) {
