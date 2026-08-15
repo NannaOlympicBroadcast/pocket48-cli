@@ -132,6 +132,29 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 这跟 DSH 那边 `allowWrites` 默认关闭是同一个取舍，只是换了一种表达方式。
 
+#### 仓库布局
+
+```
+.claude-plugin/marketplace.json     市场清单（仓库根只是市场，不再是插件）
+plugins/pocket48-cli/               只读插件
+  ├─ skills/ commands/ agents/      真实文件
+  ├─ bin src/cli src/common …       → 指向仓库根的符号链接
+  └─ package.json + package-lock.json
+plugins/pocket48-write/             写插件（纯提示词，靠 PATH 上的 snh48 干活）
+```
+
+两个插件都放在 `plugins/` 下，而不是让只读那个用 `source: "./"` 占着仓库根——
+根目录当插件时，Claude Directory 里只会显示子目录里的那个，只读插件不出现。
+
+`bin`、`src/cli`、`src/common`、`src/main/services`、`2.wasm`、`rust-wasm.js`
+是符号链接，安装时会被解引用成真实文件，所以插件是自包含的，不依赖用户手里有没有这份仓库。
+配套的 `package-lock.json` 会让 Claude Code 在拷贝后自动 `npm ci --ignore-scripts`
+把 axios/qrcode/pngjs 装进去——**没有 lockfile 就不会装**，插件会因为缺依赖跑不起来。
+
+> **Windows 注意**：git 在 Windows 上默认不创建符号链接（`core.symlinks=false`），
+> 此时这些链接会被检出成内容为路径字符串的普通文件，只读插件将无法运行。
+> 需要在 Windows 上用的话，开启开发者模式或 `git config --global core.symlinks true` 后重新克隆。
+
 ### DeepSeek Harness 插件
 
 仓库整体就是一个 DSH bundle（根 `package.json` 的 `dsh.bundle` → `cordis.patch.yml`）：
