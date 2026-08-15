@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "snh48-cli",
   "displayName": "SNH48 CLI",
   "description": "SNH48 GROUP 与口袋 48 的只读查询工具：成员名册与档案、房间消息抓取与检索、直播与回放地址、公演场次与票务、翻牌、鸡腿榜、48 区。",
