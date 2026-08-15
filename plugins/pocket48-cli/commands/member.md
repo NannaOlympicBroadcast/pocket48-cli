@@ -1,8 +1,11 @@
 ---
 description: 查成员档案（队伍、期数、生日、公式照）
 argument-hint: "<成员名或关键词>"
-allowed-tools: Bash(snh48:*)
+allowed-tools: Bash(node:*)
 ---
+
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
 
 用 `snh48` 查询成员资料。名册查询**不需要登录**。
 

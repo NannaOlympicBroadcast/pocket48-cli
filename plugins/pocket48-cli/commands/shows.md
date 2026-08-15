@@ -1,8 +1,11 @@
 ---
 description: 查最近的公演场次与余票
 argument-hint: "[团体，默认 SNH48] [天数，默认 7]"
-allowed-tools: Bash(snh48:*)
+allowed-tools: Bash(node:*)
 ---
+
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
 
 用 `snh48` 查询近期公演与票务。这条链路**不需要登录**。
 

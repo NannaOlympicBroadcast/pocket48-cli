@@ -1,8 +1,11 @@
 ---
 description: 看看现在谁在口袋 48 直播
 argument-hint: "[成员名，可选]"
-allowed-tools: Bash(snh48:*)
+allowed-tools: Bash(node:*)
 ---
+
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
 
 用 `snh48` 查询当前的口袋 48 直播情况。
 

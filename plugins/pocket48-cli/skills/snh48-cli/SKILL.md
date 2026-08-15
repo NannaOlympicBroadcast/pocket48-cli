@@ -16,9 +16,18 @@ metadata:
 
 ## 调用约定
 
-- 直接跑 `snh48 <命令>`。本 skill 随插件分发，插件的 `bin/` 会被加进 PATH，不必关心装在哪。
-  没进 PATH 时退回 `"${CLAUDE_PLUGIN_ROOT}"/bin/snh48 <命令>`；在仓库里开发则是 `node bin/snh48.js <命令>`。
-- 报 `缺少运行时依赖` 时，在插件目录执行一次 `npm install --omit=dev` 即可。
+CLI 的入口是插件根目录下的 `cli.js`，**没有**装进 PATH（claude.ai 托管的插件不允许
+插件自带 `bin/` 可执行文件），所以每次都要写全：
+
+```bash
+node "$CLAUDE_PLUGIN_ROOT/cli.js" <命令>     # 作为插件安装时
+node bin/snh48.js <命令>                      # 在 yaya_msg 仓库里开发时
+```
+
+**下文示例一律简写成 `snh48 <命令>`，实际执行时请替换成上面对应的那一条。**
+不要真的去敲 `snh48`——它不在 PATH 里，只会得到 command not found。
+
+- 首次使用报 `缺少运行时依赖` 时，按提示在插件目录执行一次 `npm install --omit=dev`。
 - **始终加 `--json`**。非 TTY 下虽然默认就是 JSON，但显式传更稳妥，输出格式也才有保证。
 - 输出恒为一个信封，先看 `ok` 再取 `data`：
 

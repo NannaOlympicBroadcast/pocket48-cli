@@ -1,8 +1,11 @@
 ---
 description: 登录口袋 48 / live.48.cn，或检查登录状态
 argument-hint: "[status｜qr｜token <token>｜sms <手机号>｜code <手机号> <验证码>｜logout]"
-allowed-tools: Bash(snh48:*)
+allowed-tools: Bash(node:*)
 ---
+
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
 
 用 `snh48` 处理登录。参数：`$ARGUMENTS`（留空按 `status` 处理）。
 

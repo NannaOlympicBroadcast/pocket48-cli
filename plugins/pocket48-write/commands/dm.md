@@ -1,8 +1,11 @@
 ---
 description: 给成员发口袋 48 私信
 argument-hint: "<成员名> <内容>"
-allowed-tools: Bash(snh48:*)
+allowed-tools: Bash(node:*)
 ---
+
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
 
 用 `snh48` 给成员发私信。**这是会真实送达对方的写操作**，按下面的顺序做，不要跳步。
 

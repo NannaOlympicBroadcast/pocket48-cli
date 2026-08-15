@@ -1,0 +1,12 @@
+{
+  "name": "pocket48-write-plugin",
+  "version": "2.9.2",
+  "private": true,
+  "description": "snh48 写操作插件。src/ 等是指向仓库根的符号链接，安装时会被解引用成真实文件。",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "axios": "^1.16.1",
+    "pngjs": "^5.0.0",
+    "qrcode": "^1.5.4"
+  }
+}

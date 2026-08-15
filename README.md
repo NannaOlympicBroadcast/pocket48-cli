@@ -100,7 +100,8 @@ snh48 login token <已有的token>          # 或用环境变量 SNH48_TOKEN
 
 ```
 /plugin marketplace add NannaOlympicBroadcast/yaya_msg
-/plugin install snh48-cli@yaya-msg
+/plugin install pocket48-cli@pocket48        # 只读查询
+/plugin install pocket48-write@pocket48      # 可选：发私信/翻牌，默认不启用
 ```
 
 装完在插件目录里跑一次 `npm install --omit=dev` 装依赖（插件是克隆下来的，不带 `node_modules`；

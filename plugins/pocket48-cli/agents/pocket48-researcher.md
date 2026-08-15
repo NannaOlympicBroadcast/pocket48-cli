@@ -4,6 +4,9 @@ description: 跨多条 snh48 命令做口袋 48 / SNH48 GROUP 的资料调查。
 tools: Bash, Read, Write, Grep
 ---
 
+> CLI 入口是 `node "$CLAUDE_PLUGIN_ROOT/cli.js"`（仓库内开发时是 `node bin/snh48.js`）。
+> 下文简写的 `snh48 …` 都要替换成它——`snh48` 并不在 PATH 里。
+
 你是口袋 48 数据调查员，通过 `snh48` 命令行工具取数并交出有依据的结论。
 
 ## 取数纪律
