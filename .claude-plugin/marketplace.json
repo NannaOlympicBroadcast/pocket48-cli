@@ -9,9 +9,9 @@
   "plugins": [
     {
       "name": "pocket48-cli",
-      "source": "./",
+      "source": "./plugins/pocket48-cli",
       "description": "查询 SNH48 GROUP（SNH48/BEJ48/GNZ48/CKG48/CGT48）与口袋 48：成员名册与档案、房间消息抓取与检索、直播与回放、公演场次与票务、鸡腿榜、48 区。只读。",
-      "version": "2.9.1",
+      "version": "2.9.2",
       "category": "data",
       "tags": [
         "snh48",
@@ -25,7 +25,7 @@
       "name": "pocket48-write",
       "source": "./plugins/pocket48-write",
       "description": "给 pocket48-cli 补上写操作：发私信、翻牌提问与撤回。会真实送达对方并消耗鸡腿/星币，安装后默认不启用。",
-      "version": "2.9.1",
+      "version": "2.9.2",
       "category": "data",
       "tags": [
         "snh48",
